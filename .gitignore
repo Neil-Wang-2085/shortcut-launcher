@@ -19,3 +19,7 @@ builder-debug.yml
 Thumbs.db
 .vscode/
 .idea/
+
+vscode-extension/node_modules/
+vscode-extension/dist/
+vscode-extension/*.vsix

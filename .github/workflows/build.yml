@@ -23,9 +23,35 @@ jobs:
       - name: Build renderers
         run: npm run build
 
+  vsix:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: vscode-extension/package-lock.json
+      - name: Install extension dependencies
+        working-directory: vscode-extension
+        run: npm ci
+      - name: Typecheck
+        working-directory: vscode-extension
+        run: npm run typecheck
+      - name: Build
+        working-directory: vscode-extension
+        run: npm run build
+      - name: Package VSIX
+        working-directory: vscode-extension
+        run: npx vsce package --no-dependencies
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: vscode-extension/*.vsix
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: test
+    needs: [test, vsix]
     runs-on: windows-latest
     permissions:
       contents: write
@@ -37,12 +63,19 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Package
+      - name: Package desktop
         run: npm run dist
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
+      - name: Download VSIX
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix
+          path: vscode-extension
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/*.exe
+          files: |
+            release/*.exe
+            vscode-extension/*.vsix
           generate_release_notes: true

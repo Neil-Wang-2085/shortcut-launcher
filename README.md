@@ -37,12 +37,29 @@
 - **轻量常驻**：托盘、单实例、离线运行，提供便携版
 - **中文说明**：250 条内置数据全部带中文描述
 
+## VS Code 扩展
+
+仓库内提供 VS Code 扩展（`vscode-extension/`），在编辑器里按 `Ctrl+Alt+Shift+K` 搜索同一套 250 条数据：
+
+- 命令：复制到剪贴板，或一键「插入终端」
+- 快捷键：打开键帽面板
+- 状态栏入口：`⌨ Shortcuts`
+
+安装（从 Releases 下载 `.vsix`）：
+
+```bash
+code --install-extension shortcut-launcher-0.1.0.vsix
+```
+
+更多说明见 [vscode-extension/README.md](vscode-extension/README.md)。
+
 ## 下载
 
 从 [Releases](https://github.com/Neil-Wang-2085/shortcut-launcher/releases) 下载：
 
 - `ShortcutLauncher-x.y.z-portable.exe`：便携版，双击即用
 - `Shortcut.Launcher.Setup.x.y.z.exe`：安装版（可选目录、桌面/开始菜单快捷方式）
+- `shortcut-launcher-0.1.0.vsix`：VS Code 扩展
 
 > 未做代码签名，首次运行可能触发 SmartScreen：点「更多信息 → 仍要运行」。介意可自行从源码构建。
 
@@ -120,10 +137,11 @@ $env:ELECTRON_BUILDER_BINARIES_MIRROR = "https://npmmirror.com/mirrors/electron-
 electron/          # 主进程、preload、三个窗口的 HTML
 renderer/          # launcher / popup / settings 的 TS（esbuild 打包）
 src/shared/        # 类型、归一化、搜索、存储、数据、中文别名/说明
+vscode-extension/  # VS Code 扩展（复用同一套数据与搜索）
 scripts/           # 打包脚本、CLI 搜索、图标生成
 tests/             # node:test 测试
 docs/screenshots/  # README 截图
-.github/workflows/ # CI：测试 + 打 tag 自动发 Release
+.github/workflows/ # CI：测试 + VSIX + 打 tag 自动发 Release
 ```
 
 ## 贡献

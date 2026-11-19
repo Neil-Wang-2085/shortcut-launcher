@@ -1,0 +1,58 @@
+{
+  "name": "shortcut-launcher",
+  "displayName": "Shortcut Launcher",
+  "description": "Search 250+ Windows / Office / VS Code / Git / GDB shortcuts and commands with Chinese descriptions. Copy commands or view keycaps without leaving VS Code.",
+  "version": "0.1.0",
+  "publisher": "Neil-Wang-2085",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Neil-Wang-2085/shortcut-launcher.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "shortcut",
+    "cheatsheet",
+    "keyboard",
+    "chinese",
+    "commands",
+    "productivity"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:shortcutLauncher.search"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "shortcutLauncher.search",
+        "title": "Search Shortcuts & Commands",
+        "category": "Shortcut Launcher"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "shortcutLauncher.search",
+        "key": "ctrl+alt+shift+k",
+        "mac": "cmd+alt+shift+k"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit",
+    "package": "npm run build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.7.2"
+  }
+}

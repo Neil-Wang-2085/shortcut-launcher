@@ -77,9 +77,9 @@ export type Entry = ShortcutEntry | CommandEntry
 
 /**
  * 搜索文档：在原始条目上追加预计算字段，供 Fuse/CJK 匹配使用。
- * 下划线字段不参与展示。
+ * 用交叉类型（而不是 interface extends），因为 Entry 是联合类型。
  */
-export interface SearchDoc extends Entry {
+export type SearchDoc = Entry & {
   _title: string
   _keys: string
   _tags: string
