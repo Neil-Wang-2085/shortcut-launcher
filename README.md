@@ -1,7 +1,6 @@
-# Shortcut Launcher
+﻿# Shortcut Launcher
 
-> Windows 快捷键 / 命令速查器：`Ctrl+Alt+K` 呼出，输入即搜，命令自动复制，快捷键透明浮层提示。
-
+> Windows 蹇嵎閿?/ 鍛戒护閫熸煡鍣細`Ctrl+Alt+K` 鍛煎嚭锛岃緭鍏ュ嵆鎼滐紝鍛戒护鑷姩澶嶅埗锛屽揩鎹烽敭閫忔槑娴眰鎻愮ず銆?
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/Neil-Wang-2085/shortcut-launcher/actions/workflows/build.yml/badge.svg)](https://github.com/Neil-Wang-2085/shortcut-launcher/actions/workflows/build.yml)
 [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/neilwang.shortcut-launcher)](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher)
@@ -9,158 +8,133 @@
 ![Electron](https://img.shields.io/badge/Electron-45-47848F)
 ![Tests](https://img.shields.io/badge/tests-31%20passing-brightgreen)
 
-内置 **250 条**快捷键与命令，覆盖 Office 三件套、Photoshop、Git、GDB、Windows、VS Code、Chrome/Edge、终端、CMake/Make、Outlook，**每条都有中文说明**。
+鍐呯疆 **250 鏉?*蹇嵎閿笌鍛戒护锛岃鐩?Office 涓変欢濂椼€丳hotoshop銆丟it銆丟DB銆乄indows銆乂S Code銆丆hrome/Edge銆佺粓绔€丆Make/Make銆丱utlook锛?*姣忔潯閮芥湁涓枃璇存槑**銆?
+## 鎴浘
 
-## 截图
-
-| Launcher | 命令补参 |
+| Launcher | 鍛戒护琛ュ弬 |
 |---|---|
 | ![Launcher](docs/screenshots/launcher.png) | ![Editor](docs/screenshots/editor.png) |
 
-| 快捷键浮层 | 偏好设置 |
+| 蹇嵎閿诞灞?| 鍋忓ソ璁剧疆 |
 |---|---|
 | ![Popup](docs/screenshots/popup.png) | ![Settings](docs/screenshots/settings.png) |
 
-## 为什么做这个
+## 涓轰粈涔堝仛杩欎釜
 
-- 中文快捷键资料分散在博客/表格里，且大多只有英文名
-- 现有启动器偏"启动应用"，对"查快捷键、抄命令"支持一般
-- 想要一个**离线、便携、带中文说明、能补命令参数**的小工具
+- 涓枃蹇嵎閿祫鏂欏垎鏁ｅ湪鍗氬/琛ㄦ牸閲岋紝涓斿ぇ澶氬彧鏈夎嫳鏂囧悕
+- 鐜版湁鍚姩鍣ㄥ亸"鍚姩搴旂敤"锛屽"鏌ュ揩鎹烽敭銆佹妱鍛戒护"鏀寔涓€鑸?- 鎯宠涓€涓?*绂荤嚎銆佷究鎼恒€佸甫涓枃璇存槑銆佽兘琛ュ懡浠ゅ弬鏁?*鐨勫皬宸ュ叿
 
-## 特性
+## 鐗规€?
+- **妯＄硦鎼滅储**锛氬璇?AND銆佹寜閿粍鍚堛€佹嫾鍐欏閿欍€佷腑鑻辨贩鍚堛€佷腑鏂?bigram 鍖归厤
+- **鍛戒护鍗崇敤**锛氬懡浠ょ粨鏋滃洖杞︾洿鎺ュ鍒讹紱鍚?`<url>` / `<branch>` / `HEAD~N` 鐨勪細鍏堝脊鍑鸿ˉ鍙傜紪杈戞潯
+- **蹇嵎閿诞灞?*锛氶€忔槑閿附灞曠ず锛屼笉鎶㈢劍鐐广€侀紶鏍囩┛閫忥紝鑷姩娑堝け锛堟椂闀垮彲閰嶏級
+- **甯哥敤浼樺厛**锛氭寜浣跨敤娆℃暟 + 鏈€杩戜娇鐢ㄥ姞鏉冿紙frecency锛夛紝瓒婄敤瓒婇『鎵?- **鑷畾涔夋潯鐩?*锛氳〃鍗曟坊鍔狅紝鎴栧鍏?JSON / CSV / 鏂囨湰
+- **鍋忓ソ璁剧疆**锛氬叏灞€鐑敭锛堢偣鍑诲綍鍒讹級銆佸紑鏈鸿嚜鍚€佹诞灞傜鏁?- **杞婚噺甯搁┗**锛氭墭鐩樸€佸崟瀹炰緥銆佺绾胯繍琛岋紝鎻愪緵渚挎惡鐗?- **涓枃璇存槑**锛?50 鏉″唴缃暟鎹叏閮ㄥ甫涓枃鎻忚堪
 
-- **模糊搜索**：多词 AND、按键组合、拼写容错、中英混合、中文 bigram 匹配
-- **命令即用**：命令结果回车直接复制；含 `<url>` / `<branch>` / `HEAD~N` 的会先弹出补参编辑条
-- **快捷键浮层**：透明键帽展示，不抢焦点、鼠标穿透，自动消失（时长可配）
-- **常用优先**：按使用次数 + 最近使用加权（frecency），越用越顺手
-- **自定义条目**：表单添加，或导入 JSON / CSV / 文本
-- **偏好设置**：全局热键（点击录制）、开机自启、浮层秒数
-- **轻量常驻**：托盘、单实例、离线运行，提供便携版
-- **中文说明**：250 条内置数据全部带中文描述
+## VS Code 鎵╁睍
 
-## VS Code 扩展
+浠撳簱鍐呮彁渚?VS Code 鎵╁睍锛坄vscode-extension/`锛夛紝鍦ㄧ紪杈戝櫒閲屾寜 `Ctrl+Alt+Shift+K` 鎼滅储鍚屼竴濂?250 鏉℃暟鎹細
 
-仓库内提供 VS Code 扩展（`vscode-extension/`），在编辑器里按 `Ctrl+Alt+Shift+K` 搜索同一套 250 条数据：
+- 鍛戒护锛氬鍒跺埌鍓创鏉匡紝鎴栦竴閿€屾彃鍏ョ粓绔€?- 蹇嵎閿細鎵撳紑閿附闈㈡澘
+- 鐘舵€佹爮鍏ュ彛锛歚鈱?Shortcuts`
+- 鏀寔鑷畾涔夊懡浠わ細鎼滅储闈㈡澘搴曢儴 **锛?鏂板鑷畾涔夊懡浠も€?*锛屾垨鍛戒护闈㈡澘 `Shortcut Launcher: Add Custom Command`
 
-- 命令：复制到剪贴板，或一键「插入终端」
-- 快捷键：打开键帽面板
-- 状态栏入口：`⌨ Shortcuts`
-- 支持自定义命令：搜索面板底部 **＋ 新增自定义命令…**，或命令面板 `Shortcut Launcher: Add Custom Command`
-
-安装（二选一）：
+瀹夎锛堜簩閫変竴锛夛細
 
 ```bash
-# 从 VS Code Marketplace
+# 浠?VS Code Marketplace
 code --install-extension neilwang.shortcut-launcher
 
-# 或从 Releases 下载 .vsix
-code --install-extension shortcut-launcher-0.1.0.vsix
+# 鎴栦粠 Releases 涓嬭浇 .vsix
+code --install-extension shortcut-launcher-0.1.1.vsix
 ```
 
-[Marketplace 页面](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher) · [扩展说明](vscode-extension/README.md)
+[Marketplace 椤甸潰](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher) 路 [鎵╁睍璇存槑](vscode-extension/README.md)
 
-## 下载
+## 涓嬭浇
 
-从 [Releases](https://github.com/Neil-Wang-2085/shortcut-launcher/releases) 下载：
+浠?[Releases](https://github.com/Neil-Wang-2085/shortcut-launcher/releases) 涓嬭浇锛?
+- `ShortcutLauncher-x.y.z-portable.exe`锛氫究鎼虹増锛屽弻鍑诲嵆鐢?- `Shortcut.Launcher.Setup.x.y.z.exe`锛氬畨瑁呯増锛堝彲閫夌洰褰曘€佹闈?寮€濮嬭彍鍗曞揩鎹锋柟寮忥級
+- `shortcut-launcher-0.1.1.vsix`锛歏S Code 鎵╁睍
 
-- `ShortcutLauncher-x.y.z-portable.exe`：便携版，双击即用
-- `Shortcut.Launcher.Setup.x.y.z.exe`：安装版（可选目录、桌面/开始菜单快捷方式）
-- `shortcut-launcher-0.1.0.vsix`：VS Code 扩展
+> 鏈仛浠ｇ爜绛惧悕锛岄娆¤繍琛屽彲鑳借Е鍙?SmartScreen锛氱偣銆屾洿澶氫俊鎭?鈫?浠嶈杩愯銆嶃€備粙鎰忓彲鑷浠庢簮鐮佹瀯寤恒€?
+鏁版嵁鐩綍锛歚%APPDATA%\shortcut-launcher\`
 
-> 未做代码签名，首次运行可能触发 SmartScreen：点「更多信息 → 仍要运行」。介意可自行从源码构建。
-
-数据目录：`%APPDATA%\shortcut-launcher\`
-
-| 文件 | 用途 |
+| 鏂囦欢 | 鐢ㄩ€?|
 |---|---|
-| `config.json` | 热键 / 开机自启 / 浮层时长 |
-| `usage.json` | 使用次数与最近使用时间（frecency） |
-| `user-entries.json` | 自定义条目 |
+| `config.json` | 鐑敭 / 寮€鏈鸿嚜鍚?/ 娴眰鏃堕暱 |
+| `usage.json` | 浣跨敤娆℃暟涓庢渶杩戜娇鐢ㄦ椂闂达紙frecency锛?|
+| `user-entries.json` | 鑷畾涔夋潯鐩?|
 
-## 使用
+## 浣跨敤
 
-- `Ctrl+Alt+K` 呼出/隐藏（可在设置里改；冲突时自动回退）
-- `↑` `↓` 选择，`Enter` 执行，`Esc` 关闭
-- 顶部 chips 按应用过滤
-
-搜索语法：
-
-| 输入 | 作用 |
+- `Ctrl+Alt+K` 鍛煎嚭/闅愯棌锛堝彲鍦ㄨ缃噷鏀癸紱鍐茬獊鏃惰嚜鍔ㄥ洖閫€锛?- `鈫慲 `鈫揱 閫夋嫨锛宍Enter` 鎵ц锛宍Esc` 鍏抽棴
+- 椤堕儴 chips 鎸夊簲鐢ㄨ繃婊?
+鎼滅储璇硶锛?
+| 杈撳叆 | 浣滅敤 |
 |---|---|
-| `word bold` | 多词 AND |
-| `ctrl b` / `ctrl+b` | 按按键组合找 |
-| `app:git rebase` | 限定应用 |
-| `type:shortcut ctrl` | 只搜快捷键 |
-| `tag:rebase` | 按标签过滤 |
-| `冻结窗格` | 中文说明直接搜 |
-| `git 改作者名字` | 中英混合 |
+| `word bold` | 澶氳瘝 AND |
+| `ctrl b` / `ctrl+b` | 鎸夋寜閿粍鍚堟壘 |
+| `app:git rebase` | 闄愬畾搴旂敤 |
+| `type:shortcut ctrl` | 鍙悳蹇嵎閿?|
+| `tag:rebase` | 鎸夋爣绛捐繃婊?|
+| `鍐荤粨绐楁牸` | 涓枃璇存槑鐩存帴鎼?|
+| `git 鏀逛綔鑰呭悕瀛梎 | 涓嫳娣峰悎 |
 
-命令与快捷键：
+鍛戒护涓庡揩鎹烽敭锛?
+- 鍛戒护锛歚Enter` 澶嶅埗锛涘甫鍗犱綅绗︽椂鍏堣ˉ鍙傦紱`Ctrl+E` 鍙紪杈戜换鎰忓懡浠?- 蹇嵎閿細`Enter` 寮瑰嚭閿附娴眰
 
-- 命令：`Enter` 复制；带占位符时先补参；`Ctrl+E` 可编辑任意命令
-- 快捷键：`Enter` 弹出键帽浮层
+鑷畾涔夋潯鐩細鎵樼洏 鈫?**Custom Entries鈥?*锛屾垨 launcher 搴曢儴 `鈿?Settings`銆傛敮鎸佽〃鍗曘€丣SON/CSV 鏂囦欢瀵煎叆銆佺矘璐存枃鏈鍏ャ€?
+## 鍐呯疆鏁版嵁锛?50 鏉★級
 
-自定义条目：托盘 → **Custom Entries…**，或 launcher 底部 `⚙ Settings`。支持表单、JSON/CSV 文件导入、粘贴文本导入。
-
-## 内置数据（250 条）
-
-| 分类 | 条数 | 覆盖 |
+| 鍒嗙被 | 鏉℃暟 | 瑕嗙洊 |
 |---|---|---|
-| Word / Excel / PPT | 20 / 21 / 17 | 格式、查找、导航 |
-| Photoshop | 25 | 图层、变换、调色、滤镜 |
-| Git | 36 | 提交、分支、变基、改作者、历史重写 |
-| GDB | 31 | 断点、单步、栈、内存、寄存器、线程 |
-| Windows | 18 | 桌面、窗口贴边、截图、剪贴板、任务管理器 |
-| VS Code | 25 | 命令面板、搜索、编辑、调试 |
-| Chrome / Edge | 19 | 标签、地址栏、DevTools、隐私 |
-| Terminal | 20 | Windows Terminal 快捷键 + 常用 shell 命令 |
-| 构建 | 8 | CMake / Make / Ninja / CTest |
-| Outlook | 10 | 邮件、回复、日历 |
+| Word / Excel / PPT | 20 / 21 / 17 | 鏍煎紡銆佹煡鎵俱€佸鑸?|
+| Photoshop | 25 | 鍥惧眰銆佸彉鎹€佽皟鑹层€佹护闀?|
+| Git | 36 | 鎻愪氦銆佸垎鏀€佸彉鍩恒€佹敼浣滆€呫€佸巻鍙查噸鍐?|
+| GDB | 31 | 鏂偣銆佸崟姝ャ€佹爤銆佸唴瀛樸€佸瘎瀛樺櫒銆佺嚎绋?|
+| Windows | 18 | 妗岄潰銆佺獥鍙ｈ创杈广€佹埅鍥俱€佸壀璐存澘銆佷换鍔＄鐞嗗櫒 |
+| VS Code | 25 | 鍛戒护闈㈡澘銆佹悳绱€佺紪杈戙€佽皟璇?|
+| Chrome / Edge | 19 | 鏍囩銆佸湴鍧€鏍忋€丏evTools銆侀殣绉?|
+| Terminal | 20 | Windows Terminal 蹇嵎閿?+ 甯哥敤 shell 鍛戒护 |
+| 鏋勫缓 | 8 | CMake / Make / Ninja / CTest |
+| Outlook | 10 | 閭欢銆佸洖澶嶃€佹棩鍘?|
 
-数据在 `src/shared/data/*.json`，中文说明在 `src/shared/zh-desc.ts`，中文别名在 `src/shared/zh-aliases.ts`。
-
-## 从源码构建
-
-要求：Node.js 22+、Windows 10/11。
-
+鏁版嵁鍦?`src/shared/data/*.json`锛屼腑鏂囪鏄庡湪 `src/shared/zh-desc.ts`锛屼腑鏂囧埆鍚嶅湪 `src/shared/zh-aliases.ts`銆?
+## 浠庢簮鐮佹瀯寤?
+瑕佹眰锛歂ode.js 22+銆乄indows 10/11銆?
 ```powershell
 npm install
-npm start        # 构建 renderer 并启动 Electron
-npm test         # 31 项搜索/存储测试
-npm run dist     # 生成 NSIS 安装包 + 便携版到 release/
+npm start        # 鏋勫缓 renderer 骞跺惎鍔?Electron
+npm test         # 31 椤规悳绱?瀛樺偍娴嬭瘯
+npm run dist     # 鐢熸垚 NSIS 瀹夎鍖?+ 渚挎惡鐗堝埌 release/
 ```
 
-国内网络可设置镜像：
+鍥藉唴缃戠粶鍙缃暅鍍忥細
 
 ```powershell
 $env:ELECTRON_MIRROR = "https://npmmirror.com/mirrors/electron/"
 $env:ELECTRON_BUILDER_BINARIES_MIRROR = "https://npmmirror.com/mirrors/electron-builder-binaries/"
 ```
 
-## 项目结构
+## 椤圭洰缁撴瀯
 
 ```
-electron/          # 主进程、preload、三个窗口的 HTML
-renderer/          # launcher / popup / settings 的 TS（esbuild 打包）
-src/shared/        # 类型、归一化、搜索、存储、数据、中文别名/说明
-vscode-extension/  # VS Code 扩展（复用同一套数据与搜索）
-scripts/           # 打包脚本、CLI 搜索、图标生成
-tests/             # node:test 测试
-docs/screenshots/  # README 截图
-.github/workflows/ # CI：测试 + VSIX + 打 tag 自动发 Release
+electron/          # 涓昏繘绋嬨€乸reload銆佷笁涓獥鍙ｇ殑 HTML
+renderer/          # launcher / popup / settings 鐨?TS锛坋sbuild 鎵撳寘锛?src/shared/        # 绫诲瀷銆佸綊涓€鍖栥€佹悳绱€佸瓨鍌ㄣ€佹暟鎹€佷腑鏂囧埆鍚?璇存槑
+vscode-extension/  # VS Code 鎵╁睍锛堝鐢ㄥ悓涓€濂楁暟鎹笌鎼滅储锛?scripts/           # 鎵撳寘鑴氭湰銆丆LI 鎼滅储銆佸浘鏍囩敓鎴?tests/             # node:test 娴嬭瘯
+docs/screenshots/  # README 鎴浘
+.github/workflows/ # CI锛氭祴璇?+ VSIX + 鎵?tag 鑷姩鍙?Release
 ```
 
-## 贡献
+## 璐＄尞
 
-欢迎补数据、修 bug、提建议，见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+娆㈣繋琛ユ暟鎹€佷慨 bug銆佹彁寤鸿锛岃 [CONTRIBUTING.md](CONTRIBUTING.md)銆?
+鏈€闇€瑕佺殑璐＄尞锛?*琛ュ厖浣犳墍鍦ㄩ鍩熺殑蹇嵎閿?鍛戒护**锛堥檮瀹樻柟鏂囨。閾炬帴锛夛紝浠ュ強**涓枃璇存槑鐨勫噯纭€?*銆?
+## 鍏嶈矗澹版槑
 
-最需要的贡献：**补充你所在领域的快捷键/命令**（附官方文档链接），以及**中文说明的准确性**。
-
-## 免责声明
-
-- 本项目与 Microsoft、Adobe、Git、GDB 等无隶属关系
-- 快捷键可能随软件版本、系统语言、键位布局变化，数据仅供参考
-- 使用本工具造成的任何问题由使用者自行承担；软件按 MIT 协议"按原样"提供
+- 鏈」鐩笌 Microsoft銆丄dobe銆丟it銆丟DB 绛夋棤闅跺睘鍏崇郴
+- 蹇嵎閿彲鑳介殢杞欢鐗堟湰銆佺郴缁熻瑷€銆侀敭浣嶅竷灞€鍙樺寲锛屾暟鎹粎渚涘弬鑰?- 浣跨敤鏈伐鍏烽€犳垚鐨勪换浣曢棶棰樼敱浣跨敤鑰呰嚜琛屾壙鎷咃紱杞欢鎸?MIT 鍗忚"鎸夊師鏍?鎻愪緵
 
 ## English
 
@@ -168,4 +142,4 @@ A Windows shortcut & command launcher with fuzzy search, Chinese descriptions, o
 
 ## License
 
-[MIT](LICENSE) © 2026 Neil Wang
+[MIT](LICENSE) 漏 2026 Neil Wang
