@@ -2,7 +2,7 @@
   "name": "shortcut-launcher",
   "displayName": "Shortcut Launcher",
   "description": "Search 250+ Windows / Office / VS Code / Git / GDB shortcuts and commands with Chinese descriptions. Copy commands or view keycaps without leaving VS Code.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "neilwang",
   "license": "MIT",
   "repository": {
@@ -32,6 +32,26 @@
       {
         "command": "shortcutLauncher.search",
         "title": "Search Shortcuts & Commands",
+        "category": "Shortcut Launcher"
+      },
+      {
+        "command": "shortcutLauncher.addEntry",
+        "title": "Add Custom Command",
+        "category": "Shortcut Launcher"
+      },
+      {
+        "command": "shortcutLauncher.importEntries",
+        "title": "Import Custom Entries (JSON)",
+        "category": "Shortcut Launcher"
+      },
+      {
+        "command": "shortcutLauncher.openEntriesFile",
+        "title": "Open Custom Entries File",
+        "category": "Shortcut Launcher"
+      },
+      {
+        "command": "shortcutLauncher.deleteEntry",
+        "title": "Delete Custom Entry",
         "category": "Shortcut Launcher"
       }
     ],

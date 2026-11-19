@@ -22,6 +22,27 @@
 - **命令**：复制到剪贴板；提示里可点「插入终端」直接执行
 - **快捷键**：在底部打开键帽面板，展示按键 + 中文说明
 
+## 自定义命令
+
+两种方式：
+
+1. 搜索面板底部 **＋ 新增自定义命令…**，按提示填标题 / 命令（或按键）/ 中文说明 / 标签
+2. 命令面板执行 `Shortcut Launcher: Add Custom Command`
+
+其他命令：
+
+- `Shortcut Launcher: Import Custom Entries (JSON)`：导入 JSON（数组或 `{ "entries": [...] }`）
+- `Shortcut Launcher: Open Custom Entries File`：直接编辑存储文件
+- `Shortcut Launcher: Delete Custom Entry`：删除自定义条目
+
+存储位置：VS Code 的 globalStorage
+
+```
+.../User/globalStorage/neilwang.shortcut-launcher/custom-entries.json
+```
+
+格式与桌面版一致，可直接从桌面版的 `user-entries.json` 复制过来。
+
 ## 内置数据
 
 250 条，覆盖 Office 三件套、Photoshop、Git、GDB、Windows、VS Code、Chrome/Edge、终端、CMake/Make、Outlook。

@@ -4,6 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/Neil-Wang-2085/shortcut-launcher/actions/workflows/build.yml/badge.svg)](https://github.com/Neil-Wang-2085/shortcut-launcher/actions/workflows/build.yml)
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/neilwang.shortcut-launcher)](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)
 ![Electron](https://img.shields.io/badge/Electron-45-47848F)
 ![Tests](https://img.shields.io/badge/tests-31%20passing-brightgreen)
@@ -44,6 +45,7 @@
 - 命令：复制到剪贴板，或一键「插入终端」
 - 快捷键：打开键帽面板
 - 状态栏入口：`⌨ Shortcuts`
+- 支持自定义命令：搜索面板底部 **＋ 新增自定义命令…**，或命令面板 `Shortcut Launcher: Add Custom Command`
 
 安装（二选一）：
 
