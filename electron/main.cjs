@@ -226,25 +226,56 @@ function createPopup() {
 
 /** 打开/聚焦自定义条目设置窗口 */
 function showSettings() {
-  if (!settingsWin || settingsWin.isDestroyed()) {
-    settingsWin = new BrowserWindow({
-      width: 800,
-      height: 720,
-      show: false,
-      title: 'Shortcut Launcher - Custom Entries',
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.cjs'),
-        contextIsolation: true,
-        nodeIntegration: false,
-      },
-    })
-    settingsWin.loadFile(path.join(__dirname, 'settings.html'))
-    settingsWin.on('closed', () => {
-      settingsWin = null
-    })
+  // 已存在：直接显示并聚焦
+  if (settingsWin && !settingsWin.isDestroyed()) {
+    settingsWin.show()
+    settingsWin.focus()
+    return
   }
-  settingsWin.show()
-  settingsWin.focus()
+
+  const win = new BrowserWindow({
+    width: 800,
+    height: 720,
+    show: false,
+    backgroundColor: '#ffffff',
+    title: 'Shortcut Launcher - Custom Entries',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  })
+  settingsWin = win
+
+  // 等首帧渲染完成再显示，避免出现空白窗口
+  let revealed = false
+  const reveal = () => {
+    if (revealed || win.isDestroyed()) return
+    revealed = true
+    win.show()
+    win.focus()
+  }
+
+  win.once('ready-to-show', reveal)
+  win.webContents.once('did-finish-load', () => setTimeout(reveal, 0))
+
+  win.loadFile(path.join(__dirname, 'settings.html')).catch((err) => {
+    console.error('[settings] load failed:', err)
+  })
+
+  win.webContents.on('did-fail-load', (_e, code, desc, url) => {
+    console.error('[settings] did-fail-load:', code, desc, url)
+  })
+  win.webContents.on('render-process-gone', (_e, details) => {
+    console.error('[settings] render-process-gone:', details)
+  })
+  win.webContents.on('console-message', (_e, level, message, line, sourceId) => {
+    if (level >= 2) console.error(`[settings console] ${message} (${sourceId}:${line})`)
+  })
+
+  win.on('closed', () => {
+    if (settingsWin === win) settingsWin = null
+  })
 }
 
 /** 显示并聚焦 launcher：定位到当前显示器居中偏上 */
