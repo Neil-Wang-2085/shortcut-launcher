@@ -30,6 +30,14 @@
 
 ## 安装
 
+### 从 Marketplace
+
+在 VS Code 扩展面板搜索 **Shortcut Launcher**，或：
+
+```bash
+code --install-extension neilwang.shortcut-launcher
+```
+
 ### 从 VSIX
 
 ```bash

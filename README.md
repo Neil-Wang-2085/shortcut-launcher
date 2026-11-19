@@ -45,13 +45,17 @@
 - 快捷键：打开键帽面板
 - 状态栏入口：`⌨ Shortcuts`
 
-安装（从 Releases 下载 `.vsix`）：
+安装（二选一）：
 
 ```bash
+# 从 VS Code Marketplace
+code --install-extension neilwang.shortcut-launcher
+
+# 或从 Releases 下载 .vsix
 code --install-extension shortcut-launcher-0.1.0.vsix
 ```
 
-更多说明见 [vscode-extension/README.md](vscode-extension/README.md)。
+[Marketplace 页面](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher) · [扩展说明](vscode-extension/README.md)
 
 ## 下载
 
