@@ -102,7 +102,7 @@ function renderList(): void {
   results.forEach((e, i) => {
     const row = document.createElement('div')
     row.className = 'row' + (i === sel ? ' sel' : '')
-    const zh = e.zh ?? e.description ?? ''
+    const zh = e.usage ? [e.zh, e.usage].filter(Boolean).join(' · ') : (e.zh ?? e.description ?? '')
     row.innerHTML =
       `<span class="badge">${escapeHtml(e.app)}</span>` +
       `<span class="type">${e.type === 'shortcut' ? '⌨' : '>_'}</span>` +
@@ -135,7 +135,8 @@ function recordUsage(id: string): void {
 function copyCommand(e: Entry, text: string): void {
   window.api.copy(text)
   recordUsage(e.id)
-  toast(`Copied: ${text}`)
+  const note = e.zh ? `（${e.zh}）` : ''
+  toast(`已复制：${text}${note}`)
   setTimeout(() => window.api.hideLauncher(), 350)
 }
 

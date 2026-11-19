@@ -32,6 +32,6 @@ window.api.onRenderPopup((e: Entry) => {
   const combo = e.type === 'shortcut' ? (e.keys.win ?? '') : ''
   keysEl.innerHTML = keycaps(combo)
   titleEl.textContent = e.title
-  zhEl.textContent = e.zh ?? ''
+  zhEl.textContent = [e.zh, e.usage].filter(Boolean).join(' · ')
   descEl.textContent = e.description ?? ''
 })

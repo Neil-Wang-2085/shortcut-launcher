@@ -60,9 +60,12 @@ function renderList(): void {
   for (const e of entries) {
     const row = document.createElement('div')
     row.className = 'entry-row' + (e.id === selectedId ? ' sel' : '')
+    const desc = e.zh ?? e.description ?? ''
     row.innerHTML =
       `<span class="badge">${escapeHtml(e.app)}</span>` +
-      `<span class="entry-title">${escapeHtml(e.title)}</span>` +
+      `<span class="entry-main"><span class="entry-title">${escapeHtml(e.title)}</span>` +
+      (desc ? `<span class="entry-desc">${escapeHtml(desc)}</span>` : '') +
+      `</span>` +
       `<span class="entry-type">${e.type}</span>`
     row.addEventListener('click', () => select(e))
     list.appendChild(row)
@@ -252,7 +255,7 @@ function renderUrlPreview(): void {
     key.textContent = e.type === 'shortcut' ? (e.keys?.win ?? '') : e.command
     const desc = document.createElement('span')
     desc.className = 'url-desc'
-    desc.textContent = e.title
+    desc.textContent = e.description ? `${e.title} · ${e.description}` : e.title
     label.append(cb, key, desc)
     urlPreviewEl.appendChild(label)
   })

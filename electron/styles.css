@@ -84,6 +84,23 @@ body {
   padding: 4px 8px 8px;
 }
 
+/* 隐藏多余滚动条（仍可滚轮滚动） */
+.results,
+.entry-list,
+.form-col,
+.url-preview {
+  scrollbar-width: none;
+}
+
+.results::-webkit-scrollbar,
+.entry-list::-webkit-scrollbar,
+.form-col::-webkit-scrollbar,
+.url-preview::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 .row {
   display: flex;
   align-items: center;
@@ -498,9 +515,25 @@ body {
 }
 
 .entry-title {
-  flex: 1;
+  flex: none;
   font-size: 13px;
   color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.entry-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.entry-desc {
+  font-size: 11px;
+  color: #94a3b8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
