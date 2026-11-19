@@ -12,10 +12,11 @@ await build({
 
 await build({
   ...common,
-  entryPoints: ['src/shared/store.ts'],
+  entryPoints: ['src/shared/store.ts', 'src/shared/url-import.ts'],
   format: 'cjs',
   platform: 'node',
-  outfile: 'dist/store.cjs',
+  outdir: 'dist',
+  outExtension: { '.js': '.cjs' },
 })
 
 await build({

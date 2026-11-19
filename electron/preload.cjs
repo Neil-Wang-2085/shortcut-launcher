@@ -26,6 +26,8 @@ contextBridge.exposeInMainWorld('api', {
   // ---------- 数据读写（invoke/handle） ----------
   /** 获取合并后的全部条目（内置 + 用户） */
   getEntries: () => ipcRenderer.invoke('get-entries'),
+  /** 从网址解析候选条目 */
+  parseUrl: (url) => ipcRenderer.invoke('parse-url', url),
   /** 保存/更新一条自定义条目 */
   saveEntry: (entry) => ipcRenderer.invoke('save-entry', entry),
   /** 删除一条自定义条目 */

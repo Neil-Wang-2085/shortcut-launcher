@@ -9,6 +9,7 @@ declare global {
       importText: (text: string, format: 'json' | 'csv') => Promise<{ ok: boolean; count?: number; error?: string }>
       importFile: () => Promise<{ ok: boolean; count?: number; file?: string; canceled?: boolean; error?: string }>
       exportFile: () => Promise<{ ok: boolean; path?: string; canceled?: boolean; error?: string }>
+      parseUrl: (url: string) => Promise<{ ok: boolean; entries?: any[]; count?: number; error?: string }>
       getConfig: () => Promise<{ hotkey: string; autostart: boolean; popupMs: number }>
       saveConfig: (patch: any) => Promise<{ ok: boolean; hotkey: string; config: any }>
     }
@@ -22,6 +23,11 @@ const autostartEl = el('autostart') as HTMLInputElement
 const popupSecEl = el('popupSec') as HTMLInputElement
 const savePrefsEl = el('savePrefs') as HTMLButtonElement
 const prefStatusEl = el('prefStatus') as HTMLElement
+
+const urlInputEl = el('urlInput') as HTMLInputElement
+const urlStatusEl = el('urlStatus') as HTMLElement
+const urlPreviewEl = el('urlPreview') as HTMLElement
+const urlActionsEl = el('urlActions') as HTMLElement
 
 let entries: Entry[] = []
 let selectedId: string | null = null
@@ -223,6 +229,80 @@ async function loadConfig(): Promise<void> {
   popupSecEl.value = String(Math.max(1, Math.round(cfg.popupMs / 1000)))
 }
 
+// ---------- 从网址导入 ----------
+let parsed: any[] = []
+
+function urlStatus(msg: string, isError = false): void {
+  urlStatusEl.textContent = msg
+  urlStatusEl.className = 'status' + (isError ? ' err' : ' ok')
+}
+
+function renderUrlPreview(): void {
+  urlPreviewEl.innerHTML = ''
+  urlActionsEl.style.display = parsed.length ? 'flex' : 'none'
+  parsed.forEach((e, i) => {
+    const label = document.createElement('label')
+    label.className = 'url-item'
+    const cb = document.createElement('input')
+    cb.type = 'checkbox'
+    cb.checked = true
+    cb.dataset.i = String(i)
+    const key = document.createElement('span')
+    key.className = 'url-key'
+    key.textContent = e.type === 'shortcut' ? (e.keys?.win ?? '') : e.command
+    const desc = document.createElement('span')
+    desc.className = 'url-desc'
+    desc.textContent = e.title
+    label.append(cb, key, desc)
+    urlPreviewEl.appendChild(label)
+  })
+}
+
+async function parseUrlFromInput(): Promise<void> {
+  const url = urlInputEl.value.trim()
+  if (!url) {
+    urlStatus('请输入网址', true)
+    return
+  }
+  urlStatus('解析中…')
+  const res = await window.api.parseUrl(url)
+  if (!res.ok) {
+    parsed = []
+    renderUrlPreview()
+    urlStatus(res.error ?? '解析失败', true)
+    return
+  }
+  parsed = res.entries ?? []
+  renderUrlPreview()
+  urlStatus(`解析到 ${parsed.length} 条候选，请勾选后导入`)
+}
+
+async function importUrlSelected(): Promise<void> {
+  const selected = parsed.filter((_, i) => {
+    const cb = urlPreviewEl.querySelector(`input[data-i="${i}"]`) as HTMLInputElement | null
+    return !!cb?.checked
+  })
+  if (selected.length === 0) {
+    urlStatus('没有选中条目', true)
+    return
+  }
+  const res = await window.api.importText(JSON.stringify(selected), 'json')
+  if (res.ok) {
+    urlStatus(`已导入 ${res.count} 条`)
+    parsed = []
+    renderUrlPreview()
+    await reload()
+  } else {
+    urlStatus(res.error ?? '导入失败', true)
+  }
+}
+
+function setAllUrlChecks(checked: boolean): void {
+  urlPreviewEl.querySelectorAll('input[type="checkbox"]').forEach((el) => {
+    ;(el as HTMLInputElement).checked = checked
+  })
+}
+
 // 点击热键框后直接按组合键即可录制
 hotkeyEl.addEventListener('keydown', (ev) => {
   ev.preventDefault()
@@ -260,6 +340,17 @@ el('importFile').addEventListener('click', importFile)
 el('exportFile').addEventListener('click', exportFile)
 el('importJson').addEventListener('click', () => importText('json'))
 el('importCsv').addEventListener('click', () => importText('csv'))
+
+el('parseUrl').addEventListener('click', parseUrlFromInput)
+el('urlSelectAll').addEventListener('click', () => setAllUrlChecks(true))
+el('urlSelectNone').addEventListener('click', () => setAllUrlChecks(false))
+el('urlImport').addEventListener('click', importUrlSelected)
+urlInputEl.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter') {
+    ev.preventDefault()
+    void parseUrlFromInput()
+  }
+})
 
 toggleRows()
 reload()

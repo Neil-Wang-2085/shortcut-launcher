@@ -382,6 +382,72 @@ body {
   background: #f8fafc;
 }
 
+/* 从网址导入 */
+.url-import {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.url-row {
+  display: flex;
+  gap: 8px;
+}
+
+#urlInput {
+  flex: 1;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 7px 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  outline: none;
+  color: #0f172a;
+}
+
+#urlInput:focus {
+  border-color: #1f4d8a;
+}
+
+.url-preview {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 8px;
+}
+
+.url-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.url-item:hover {
+  background: #f8fafc;
+}
+
+.url-key {
+  font-family: Consolas, monospace;
+  color: #1f4d8a;
+  min-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.url-desc {
+  color: #475569;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .settings-grid {
   display: grid;
   grid-template-columns: 1fr 1.15fr;

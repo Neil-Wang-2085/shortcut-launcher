@@ -1,6 +1,6 @@
 {
   "name": "shortcut-launcher",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "main": "electron/main.cjs",
@@ -27,7 +27,7 @@
     "dist": "npm run build && electron-builder --win --x64 --publish never",
     "pack": "npm run build && electron-builder --dir --win --x64",
     "search": "node scripts/search.ts",
-    "test": "node --test tests/search.test.ts tests/store.test.ts",
+    "test": "node --test tests/search.test.ts tests/store.test.ts tests/url-import.test.ts",
     "icon": "python scripts/make_icon.py"
   },
   "dependencies": {

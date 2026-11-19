@@ -1,4 +1,6 @@
 import * as vscode from 'vscode'
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 import { Searcher } from '../../src/shared/search'
 import { ENTRIES } from '../../src/shared/data'
 import { normalizeEntry } from '../../src/shared/store'
@@ -29,6 +31,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.commands.registerCommand('shortcutLauncher.search', () => search()),
     vscode.commands.registerCommand('shortcutLauncher.addEntry', () => addEntry()),
     vscode.commands.registerCommand('shortcutLauncher.importEntries', () => importEntries()),
+    vscode.commands.registerCommand('shortcutLauncher.importFolder', () => openImportPanel()),
     vscode.commands.registerCommand('shortcutLauncher.openEntriesFile', () => openEntriesFile()),
     vscode.commands.registerCommand('shortcutLauncher.deleteEntry', () => deleteEntry()),
   )
@@ -308,6 +311,270 @@ function keycapHtml(e: ShortcutEntry): string {
   <h1>${escapeHtml(e.title)}</h1>
   <div class="zh">${escapeHtml(e.zh ?? '')}</div>
   <div class="desc">${escapeHtml(e.description ?? '')}</div>
+</body>
+</html>`
+}
+
+// ---------- 从文件夹导入 ----------
+
+let importPanel: vscode.WebviewPanel | undefined
+let lastScanEntries: Entry[] = []
+
+interface ScanFile {
+  path: string
+  count: number
+  error?: string
+}
+
+type ScanResult =
+  | { ok: true; entries: Entry[]; files: ScanFile[] }
+  | { ok: false; error: string }
+
+function openImportPanel(): void {
+  if (importPanel) {
+    importPanel.reveal()
+    return
+  }
+
+  importPanel = vscode.window.createWebviewPanel(
+    'shortcutLauncher.importFolder',
+    '从文件夹导入命令',
+    vscode.ViewColumn.One,
+    { enableScripts: true, retainContextWhenHidden: true },
+  )
+  importPanel.webview.html = importHtml()
+  importPanel.onDidDispose(() => {
+    importPanel = undefined
+  })
+
+  importPanel.webview.onDidReceiveMessage(async (msg: any) => {
+    if (msg.type === 'pickFolder') {
+      const uris = await vscode.window.showOpenDialog({
+        canSelectFolders: true,
+        canSelectFiles: false,
+        canSelectMany: false,
+        openLabel: '选择文件夹',
+      })
+      if (uris && uris[0]) {
+        importPanel?.webview.postMessage({ type: 'folder', path: uris[0].fsPath })
+      }
+      return
+    }
+
+    if (msg.type === 'scan') {
+      const result = await scanFolder(String(msg.path ?? ''))
+      if (!result.ok) {
+        importPanel?.webview.postMessage({ type: 'scanError', error: result.error })
+        return
+      }
+      lastScanEntries = result.entries
+      let imported = 0
+      if (msg.autoImport && result.entries.length > 0) {
+        imported = await mergeCustom(result.entries)
+      }
+      importPanel?.webview.postMessage({
+        type: 'scanResult',
+        files: result.files,
+        entries: result.entries.slice(0, 300).map(summarize),
+        count: result.entries.length,
+        imported,
+      })
+      return
+    }
+
+    if (msg.type === 'import') {
+      const imported = await mergeCustom(lastScanEntries)
+      importPanel?.webview.postMessage({ type: 'imported', count: imported })
+    }
+  })
+}
+
+async function mergeCustom(entries: Entry[]): Promise<number> {
+  const map = new Map(customEntries.map((e) => [e.id, e]))
+  let added = 0
+  for (const e of entries) {
+    if (!map.has(e.id)) added++
+    map.set(e.id, e)
+  }
+  customEntries = [...map.values()]
+  await saveCustom(customEntries)
+  rebuild()
+  return added
+}
+
+function summarize(e: Entry): any {
+  return {
+    type: e.type,
+    title: e.title,
+    detail: e.type === 'command' ? e.command : (e.keys.win ?? ''),
+    description: e.description ?? '',
+  }
+}
+
+function safeIdPart(s: string): string {
+  return s.replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'file'
+}
+
+async function scanFolder(root: string): Promise<ScanResult> {
+  if (!root) return { ok: false, error: '请输入文件夹路径' }
+  try {
+    const st = await fs.stat(root)
+    if (!st.isDirectory()) return { ok: false, error: '路径不是文件夹' }
+  } catch {
+    return { ok: false, error: '路径不存在或无法访问' }
+  }
+
+  const files: ScanFile[] = []
+  const entries: Entry[] = []
+  const seen = new Set<string>()
+  let fileCount = 0
+  const MAX_FILES = 500
+
+  async function walk(dir: string, depth: number): Promise<void> {
+    if (depth > 6 || fileCount >= MAX_FILES) return
+    const items = await fs.readdir(dir, { withFileTypes: true }).catch(() => [])
+    for (const it of items) {
+      if (fileCount >= MAX_FILES) return
+      const full = path.join(dir, it.name)
+      if (it.isDirectory()) {
+        if (['node_modules', '.git', 'dist', 'out', '.vscode'].includes(it.name)) continue
+        await walk(full, depth + 1)
+      } else if (it.isFile() && it.name.toLowerCase().endsWith('.json')) {
+        fileCount++
+        const rel = path.relative(root, full) || it.name
+        try {
+          const raw = await fs.readFile(full, 'utf8')
+          const data = JSON.parse(raw)
+          const arr: any[] = Array.isArray(data) ? data : Array.isArray(data?.entries) ? data.entries : []
+          let count = 0
+          arr.forEach((item, idx) => {
+            const withId =
+              item && typeof item === 'object' && !item.id
+                ? { ...item, id: `custom.${safeIdPart(rel)}.${idx}` }
+                : item
+            const e = normalizeEntry(withId)
+            if (!e || seen.has(e.id)) return
+            seen.add(e.id)
+            entries.push(e)
+            count++
+          })
+          files.push({ path: rel, count })
+        } catch (err) {
+          files.push({ path: rel, count: 0, error: String(err) })
+        }
+      }
+    }
+  }
+
+  await walk(root, 0)
+  return { ok: true, entries, files }
+}
+
+function importHtml(): string {
+  const n = Math.random().toString(36).slice(2) + Date.now().toString(36)
+  return `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${n}';">
+<style>
+  body { margin: 0; padding: 22px 26px; font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); }
+  h1 { font-size: 18px; margin: 0 0 6px; }
+  .hint { font-size: 12px; color: var(--vscode-descriptionForeground); margin-bottom: 16px; }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  input[type=text] { flex: 1; padding: 6px 8px; font-family: var(--vscode-font-family); font-size: 13px; color: var(--vscode-input-foreground); background: var(--vscode-input-background); border: 1px solid var(--vscode-input-border); border-radius: 4px; outline: none; }
+  button { padding: 6px 12px; font-size: 12px; color: var(--vscode-button-foreground); background: var(--vscode-button-background); border: none; border-radius: 4px; cursor: pointer; }
+  button.secondary { color: var(--vscode-button-secondaryForeground); background: var(--vscode-button-secondaryBackground); }
+  button:disabled { opacity: .5; cursor: default; }
+  label.check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--vscode-descriptionForeground); margin-bottom: 10px; }
+  .status { font-size: 12px; min-height: 18px; margin-bottom: 8px; }
+  .status.err { color: var(--vscode-errorForeground); }
+  .files { max-height: 150px; overflow: auto; border: 1px solid var(--vscode-panel-border); border-radius: 4px; margin-bottom: 12px; }
+  .file { display: flex; justify-content: space-between; gap: 12px; padding: 4px 8px; font-size: 12px; border-bottom: 1px solid var(--vscode-panel-border); }
+  .file:last-child { border-bottom: none; }
+  .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fcount { color: var(--vscode-descriptionForeground); white-space: nowrap; }
+  .fcount.err { color: var(--vscode-errorForeground); }
+  .preview { max-height: 320px; overflow: auto; border: 1px solid var(--vscode-panel-border); border-radius: 4px; }
+  .item { display: flex; gap: 10px; padding: 4px 8px; font-size: 12px; border-bottom: 1px solid var(--vscode-panel-border); }
+  .item:last-child { border-bottom: none; }
+  .type { width: 70px; color: var(--vscode-descriptionForeground); }
+  .detail { width: 42%; font-family: var(--vscode-editor-font-family); color: var(--vscode-textLink-foreground); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .actions { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+</style>
+</head>
+<body>
+  <h1>从文件夹导入命令</h1>
+  <div class="hint">扫描指定文件夹下所有 .json 文件，自动识别其中的命令 / 快捷键。</div>
+  <div class="row">
+    <input id="path" type="text" placeholder="例如 D:\\shortcuts 或 /home/me/shortcuts" />
+    <button id="pick" class="secondary">选择文件夹…</button>
+    <button id="scan">扫描</button>
+  </div>
+  <label class="check"><input id="autoImport" type="checkbox" checked /> 扫描后自动导入</label>
+  <div id="status" class="status"></div>
+  <div id="files" class="files"></div>
+  <div id="preview" class="preview"></div>
+  <div class="actions">
+    <button id="import" disabled>导入全部</button>
+    <span id="count" class="hint"></span>
+  </div>
+<script nonce="${n}">
+  const vscode = acquireVsCodeApi();
+  const pathEl = document.getElementById('path');
+  const autoEl = document.getElementById('autoImport');
+  const statusEl = document.getElementById('status');
+  const filesEl = document.getElementById('files');
+  const previewEl = document.getElementById('preview');
+  const importBtn = document.getElementById('import');
+  const countEl = document.getElementById('count');
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function setStatus(msg, isErr) {
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status' + (isErr ? ' err' : '');
+  }
+
+  document.getElementById('pick').addEventListener('click', () => {
+    vscode.postMessage({ type: 'pickFolder' });
+  });
+
+  document.getElementById('scan').addEventListener('click', () => {
+    const p = pathEl.value.trim();
+    if (!p) { setStatus('请输入文件夹路径', true); return; }
+    setStatus('扫描中…');
+    vscode.postMessage({ type: 'scan', path: p, autoImport: autoEl.checked });
+  });
+
+  importBtn.addEventListener('click', () => {
+    vscode.postMessage({ type: 'import' });
+  });
+
+  window.addEventListener('message', (event) => {
+    const m = event.data || {};
+    if (m.type === 'folder') {
+      pathEl.value = m.path;
+      return;
+    }
+    if (m.type === 'scanError') {
+      setStatus(m.error || '扫描失败', true);
+      return;
+    }
+    if (m.type === 'scanResult') {
+      filesEl.innerHTML = (m.files || []).map((f) => '<div class="file"><span class="fname">' + esc(f.path) + '</span><span class="fcount' + (f.error ? ' err' : '') + '">' + (f.error ? '解析失败' : f.count + ' 条') + '</span></div>').join('');
+      previewEl.innerHTML = (m.entries || []).map((e) => '<div class="item"><span class="type">' + esc(e.type) + '</span><span class="detail">' + esc(e.detail) + '</span><span class="title">' + esc(e.title) + '</span></div>').join('');
+      countEl.textContent = '共 ' + m.count + ' 条';
+      importBtn.disabled = !m.count;
+      setStatus(m.imported ? '已自动导入 ' + m.imported + ' 条' : '扫描到 ' + m.count + ' 条，可点击导入全部');
+      return;
+    }
+    if (m.type === 'imported') {
+      setStatus('已导入 ' + m.count + ' 条');
+    }
+  });
+</script>
 </body>
 </html>`
 }

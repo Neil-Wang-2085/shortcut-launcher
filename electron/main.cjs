@@ -29,6 +29,7 @@ const fs = require('node:fs')
 const ROOT = path.join(__dirname, '..')
 // 由 esbuild 打包生成：数据合并/导入解析、内置种子数据
 const store = require(path.join(ROOT, 'dist', 'store.cjs'))
+const { parseHtml } = require(path.join(ROOT, 'dist', 'url-import.cjs'))
 const { ENTRIES: SEED } = require(path.join(ROOT, 'dist', 'seed.cjs'))
 
 // 统一开发版与安装版的 userData 目录名（%APPDATA%\shortcut-launcher）
@@ -140,6 +141,16 @@ function saveUsage(u) {
 
 // 热键回退顺序（用户配置失败时依次尝试）
 const FALLBACK_HOTKEYS = ['Control+Alt+K', 'Control+Alt+Space', 'Control+Shift+Space']
+
+/** 粗略判断内网 / 本机地址，避免 URL 导入被用来访问本机服务 */
+function isPrivateHost(host) {
+  const h = String(host || '').toLowerCase()
+  if (h === 'localhost' || h === '::1' || h.endsWith('.local')) return true
+  if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h)) return true
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true
+  if (/^169\.254\./.test(h)) return true
+  return false
+}
 
 /** 注册热键：先试用户配置，失败则回退；成功返回 true */
 function registerHotkey(accel) {
@@ -329,6 +340,18 @@ function runSmoke() {
       showSettings()
       setTimeout(async () => {
         try {
+          await settingsWin.webContents.executeJavaScript(
+            `(() => { const u = document.getElementById('urlInput'); if (u) { u.value = 'https://example.com'; document.getElementById('parseUrl').click(); } return true })()`,
+          )
+          await new Promise((r) => setTimeout(r, 2000))
+          const status = await settingsWin.webContents.executeJavaScript(
+            `document.getElementById('urlStatus').textContent`,
+          )
+          log('url status: ' + status)
+        } catch (e) {
+          log('url parse trigger failed ' + e)
+        }
+        try {
           const img3 = await settingsWin.webContents.capturePage()
           fs.writeFileSync(path.join(ROOT, 'smoke-settings.png'), img3.toPNG())
           log('settings captured')
@@ -419,6 +442,39 @@ if (!gotLock) {
 
     // 获取合并后的全部条目
     ipcMain.handle('get-entries', () => allEntries())
+
+    // 从网址解析快捷键 / 命令（返回候选，由界面勾选后导入）
+    ipcMain.handle('parse-url', async (_e, rawUrl) => {
+      try {
+        const u = new URL(String(rawUrl ?? ''))
+        if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+          return { ok: false, error: '仅支持 http/https 地址' }
+        }
+        if (isPrivateHost(u.hostname)) {
+          return { ok: false, error: '不支持内网 / 本机地址' }
+        }
+
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 15000)
+        const res = await fetch(u.href, {
+          signal: controller.signal,
+          redirect: 'follow',
+          headers: { 'User-Agent': 'ShortcutLauncher/0.3.0' },
+        })
+        clearTimeout(timer)
+
+        if (!res.ok) return { ok: false, error: `HTTP ${res.status}` }
+        if (isPrivateHost(new URL(res.url).hostname)) {
+          return { ok: false, error: '不支持内网 / 本机地址' }
+        }
+
+        const html = await res.text()
+        const entries = parseHtml(html.slice(0, 2_000_000), u.href)
+        return { ok: true, entries, count: entries.length, source: u.href }
+      } catch (err) {
+        return { ok: false, error: String(err) }
+      }
+    })
 
     // 保存/更新一条自定义条目
     ipcMain.handle('save-entry', (_e, raw) => {
