@@ -3,6 +3,7 @@
 > Windows 快捷键 / 命令速查器：`Ctrl+Alt+K` 呼出，输入即搜，命令自动复制，快捷键透明浮层提示。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/Neil-Wang-2085/shortcut-launcher/actions/workflows/build.yml/badge.svg)](https://github.com/Neil-Wang-2085/shortcut-launcher/actions/workflows/build.yml)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)
 ![Electron](https://img.shields.io/badge/Electron-45-47848F)
 ![Tests](https://img.shields.io/badge/tests-31%20passing-brightgreen)
@@ -41,7 +42,7 @@
 从 [Releases](https://github.com/Neil-Wang-2085/shortcut-launcher/releases) 下载：
 
 - `ShortcutLauncher-x.y.z-portable.exe`：便携版，双击即用
-- `Shortcut Launcher Setup x.y.z.exe`：安装版（可选目录、桌面/开始菜单快捷方式）
+- `Shortcut.Launcher.Setup.x.y.z.exe`：安装版（可选目录、桌面/开始菜单快捷方式）
 
 > 未做代码签名，首次运行可能触发 SmartScreen：点「更多信息 → 仍要运行」。介意可自行从源码构建。
 
