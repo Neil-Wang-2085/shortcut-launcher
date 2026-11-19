@@ -1,0 +1,5 @@
+id,app,type,title,command,keys,description,tags,platform
+custom.gdb-regs,gdb,command,Show registers,info registers,,Print CPU registers,debug;register,win
+custom.gdb-bt,gdb,command,Backtrace all threads,thread apply all bt,,Backtrace every thread,debug;backtrace,win
+custom.git-amend-note,git,command,Amend without editing,git commit --amend --no-edit,,Keep the same commit message,git;amend,win
+custom.word-reformat,word,shortcut,Reformat selection,,Ctrl+Alt+L,Reformat the selected text,format,win

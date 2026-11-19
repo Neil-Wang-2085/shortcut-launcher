@@ -1,0 +1,18 @@
+[
+  {
+    "app": "custom",
+    "type": "command",
+    "title": "Open project folder",
+    "command": "explorer .",
+    "description": "Open the current folder in File Explorer",
+    "tags": ["file", "explorer"]
+  },
+  {
+    "app": "custom",
+    "type": "shortcut",
+    "title": "Toggle terminal",
+    "keys": { "win": "Ctrl+`" },
+    "description": "Show or hide the integrated terminal",
+    "tags": ["view", "terminal"]
+  }
+]

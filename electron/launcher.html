@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+  <title>Shortcut Launcher</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="launcher">
+    <div class="search-row">
+      <span class="search-icon">⌕</span>
+      <input id="q" type="text" placeholder="Search shortcuts and commands…" autocomplete="off" spellcheck="false" />
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="results" id="results"></div>
+    <div class="editor" id="editor">
+      <div class="editor-label">补全参数后回车复制（Esc 取消）</div>
+      <input id="cmdInput" type="text" spellcheck="false" autocomplete="off" />
+    </div>
+    <div class="footer">
+      <span>↑↓ navigate · Enter run · Ctrl+E edit · Esc close</span>
+      <span><span id="count"></span> <span class="link" id="settings">⚙ Settings</span></span>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script type="module" src="../dist/launcher.js"></script>
+</body>
+</html>

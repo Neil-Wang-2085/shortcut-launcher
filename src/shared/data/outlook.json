@@ -1,0 +1,12 @@
+[
+  { "id": "outlook.new-mail", "app": "outlook", "type": "shortcut", "title": "New Mail", "keys": { "win": "Ctrl+N" }, "description": "Compose a new email", "tags": ["mail", "new"], "platform": "win", "builtin": true },
+  { "id": "outlook.reply", "app": "outlook", "type": "shortcut", "title": "Reply", "keys": { "win": "Ctrl+R" }, "description": "Reply to the selected message", "tags": ["mail", "reply"], "platform": "win", "builtin": true },
+  { "id": "outlook.reply-all", "app": "outlook", "type": "shortcut", "title": "Reply All", "keys": { "win": "Ctrl+Shift+R" }, "description": "Reply to all recipients", "tags": ["mail", "reply"], "platform": "win", "builtin": true },
+  { "id": "outlook.forward", "app": "outlook", "type": "shortcut", "title": "Forward", "keys": { "win": "Ctrl+F" }, "description": "Forward the selected message", "tags": ["mail", "forward"], "platform": "win", "builtin": true },
+  { "id": "outlook.send", "app": "outlook", "type": "shortcut", "title": "Send Mail", "keys": { "win": "Ctrl+Enter" }, "description": "Send the message being composed", "tags": ["mail", "send"], "platform": "win", "builtin": true },
+  { "id": "outlook.search", "app": "outlook", "type": "shortcut", "title": "Search Mail", "keys": { "win": "Ctrl+E" }, "description": "Focus the search box", "tags": ["mail", "search"], "platform": "win", "builtin": true },
+  { "id": "outlook.mail-view", "app": "outlook", "type": "shortcut", "title": "Mail View", "keys": { "win": "Ctrl+1" }, "description": "Switch to the Mail view", "tags": ["view", "mail"], "platform": "win", "builtin": true },
+  { "id": "outlook.calendar-view", "app": "outlook", "type": "shortcut", "title": "Calendar View", "keys": { "win": "Ctrl+2" }, "description": "Switch to the Calendar view", "tags": ["view", "calendar"], "platform": "win", "builtin": true },
+  { "id": "outlook.new-appointment", "app": "outlook", "type": "shortcut", "title": "New Appointment", "keys": { "win": "Ctrl+Shift+A" }, "description": "Create a calendar appointment", "tags": ["calendar", "new"], "platform": "win", "builtin": true },
+  { "id": "outlook.mark-read", "app": "outlook", "type": "shortcut", "title": "Mark as Read", "keys": { "win": "Ctrl+Q" }, "description": "Mark the selected message as read", "tags": ["mail", "read"], "platform": "win", "builtin": true }
+]

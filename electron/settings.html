@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+  <title>Custom Entries</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="settings-body">
+  <div class="settings">
+    <header class="settings-head">
+      <h1>Custom Entries</h1>
+      <span class="hint">Add your own commands or shortcuts. Built-in entries stay read-only.</span>
+    </header>
+
+    <section class="prefs">
+      <div class="pref-title">Preferences</div>
+      <div class="pref-row">
+        <label class="pref-field"><span>Hotkey</span><input id="hotkey" readonly placeholder="点击后按下组合键" /></label>
+        <label class="pref-check"><input type="checkbox" id="autostart" /> Start with Windows</label>
+        <label class="pref-field small"><span>Popup seconds</span><input id="popupSec" type="number" min="1" max="10" step="1" /></label>
+        <button id="savePrefs" class="btn primary">Save preferences</button>
+      </div>
+      <div id="prefStatus" class="status"></div>
+    </section>
+
+    <div class="settings-grid">
+      <section class="col list-col">
+        <div class="list-head">
+          <span>My entries <span id="count" class="muted"></span></span>
+          <button id="new" class="btn">New</button>
+        </div>
+        <div id="list" class="entry-list"></div>
+        <div class="io-row">
+          <button id="importFile" class="btn ghost">Import file…</button>
+          <button id="exportFile" class="btn ghost">Export JSON</button>
+        </div>
+      </section>
+
+      <section class="col form-col">
+        <div class="field-row">
+          <label class="field"><span>App</span>
+            <select id="app">
+              <option value="custom">custom</option>
+              <option value="word">word</option>
+              <option value="excel">excel</option>
+              <option value="powerpoint">powerpoint</option>
+              <option value="photoshop">photoshop</option>
+              <option value="git">git</option>
+              <option value="gdb">gdb</option>
+            </select>
+          </label>
+          <label class="field"><span>Type</span>
+            <select id="type">
+              <option value="command">command</option>
+              <option value="shortcut">shortcut</option>
+            </select>
+          </label>
+        </div>
+        <label class="field"><span>Title</span><input id="title" placeholder="e.g. Show registers" /></label>
+        <label class="field" id="keysRow"><span>Keys</span><input id="keys" placeholder="e.g. Ctrl+Shift+R" /></label>
+        <label class="field" id="cmdRow"><span>Command</span><input id="command" placeholder="e.g. gdb -p 1234" /></label>
+        <label class="field"><span>Description</span><input id="description" placeholder="What it does" /></label>
+        <label class="field"><span>Tags</span><input id="tags" placeholder="e.g. debug; register" /></label>
+
+        <div class="actions">
+          <button id="save" class="btn primary">Save</button>
+          <button id="delete" class="btn danger">Delete</button>
+        </div>
+        <div id="status" class="status"></div>
+
+        <details class="bulk">
+          <summary>Bulk input (paste JSON or CSV)</summary>
+          <textarea id="bulk" rows="6" placeholder='[{"app":"custom","type":"command","title":"Show registers","command":"info registers"}]'></textarea>
+          <div class="actions">
+            <button id="importJson" class="btn ghost">Import JSON text</button>
+            <button id="importCsv" class="btn ghost">Import CSV text</button>
+          </div>
+        </details>
+      </section>
+    </div>
+  </div>
+  <script type="module" src="../dist/settings.js"></script>
+</body>
+</html>

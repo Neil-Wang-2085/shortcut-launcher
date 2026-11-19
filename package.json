@@ -1,0 +1,41 @@
+{
+  "name": "shortcut-launcher",
+  "version": "0.1.4",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "description": "Windows shortcut & command launcher with fuzzy search, Chinese descriptions and a keycap overlay",
+  "license": "MIT",
+  "author": "Neil Wang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Neil-Wang-2085/shortcut-launcher.git"
+  },
+  "homepage": "https://github.com/Neil-Wang-2085/shortcut-launcher#readme",
+  "keywords": [
+    "electron",
+    "shortcut",
+    "cheatsheet",
+    "launcher",
+    "windows",
+    "chinese",
+    "productivity"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "npm run build && electron .",
+    "dist": "npm run build && electron-builder --win --x64",
+    "pack": "npm run build && electron-builder --dir --win --x64",
+    "search": "node scripts/search.ts",
+    "test": "node --test tests/search.test.ts tests/store.test.ts",
+    "icon": "python scripts/make_icon.py"
+  },
+  "dependencies": {
+    "fuse.js": "^7.1.0"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2"
+  }
+}

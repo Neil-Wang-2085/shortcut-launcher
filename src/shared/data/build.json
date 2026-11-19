@@ -1,0 +1,10 @@
+[
+  { "id": "build.cmake-configure", "app": "build", "type": "command", "title": "CMake configure", "command": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug", "description": "Configure a project into build/ with Debug type", "tags": ["cmake", "configure"], "platform": "all", "builtin": true },
+  { "id": "build.cmake-build", "app": "build", "type": "command", "title": "CMake build", "command": "cmake --build build -j", "description": "Build the configured project in parallel", "tags": ["cmake", "build"], "platform": "all", "builtin": true },
+  { "id": "build.cmake-clean", "app": "build", "type": "command", "title": "CMake clean", "command": "cmake --build build --target clean", "description": "Clean build outputs", "tags": ["cmake", "clean"], "platform": "all", "builtin": true },
+  { "id": "build.ctest", "app": "build", "type": "command", "title": "Run CTest", "command": "ctest --test-dir build --output-on-failure", "description": "Run tests and show failures", "tags": ["ctest", "test"], "platform": "all", "builtin": true },
+  { "id": "build.make", "app": "build", "type": "command", "title": "Make parallel", "command": "make -j$(nproc)", "description": "Build with all CPU cores", "tags": ["make", "build"], "platform": "all", "builtin": true },
+  { "id": "build.make-clean", "app": "build", "type": "command", "title": "Make clean", "command": "make clean", "description": "Remove build outputs", "tags": ["make", "clean"], "platform": "all", "builtin": true },
+  { "id": "build.ninja", "app": "build", "type": "command", "title": "Ninja build", "command": "ninja -C build", "description": "Build with Ninja", "tags": ["ninja", "build"], "platform": "all", "builtin": true },
+  { "id": "build.gcc-debug", "app": "build", "type": "command", "title": "Compile one file (debug)", "command": "gcc -g -O0 -c file.c -o file.o", "description": "Compile a single C file with debug info", "tags": ["gcc", "compile"], "platform": "all", "builtin": true }
+]
