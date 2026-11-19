@@ -32,6 +32,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: vscode-extension/package-lock.json
+      - name: Install root dependencies (shared code types)
+        run: npm ci --ignore-scripts
       - name: Install extension dependencies
         working-directory: vscode-extension
         run: npm ci
