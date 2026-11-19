@@ -46,7 +46,7 @@
 - 命令：复制到剪贴板，或一键「插入终端」
 - 快捷键：打开键帽面板
 - 状态栏入口：`⌨ Shortcuts`
-- 自定义命令：搜索面板底部 **＋ 新增自定义命令…**
+- 自定义命令：搜索面板底部 **＋ 新增自定义命令…**，支持新增 / 编辑 / 删除
 - **从文件夹批量导入**：命令面板 `Shortcut Launcher: Import Commands from Folder…`，给一个文件夹路径，自动扫描所有 JSON 并导入
 
 安装（二选一）：
@@ -56,7 +56,7 @@
 code --install-extension neilwang.shortcut-launcher
 
 # 或从 Releases 下载 .vsix
-code --install-extension shortcut-launcher-0.2.3.vsix
+code --install-extension shortcut-launcher-0.2.4.vsix
 ```
 
 [Marketplace 页面](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher) · [扩展说明](vscode-extension/README.md)

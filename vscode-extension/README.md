@@ -33,9 +33,13 @@
 
 其他命令：
 
+- `Shortcut Launcher: Edit Custom Entry`：编辑已有自定义条目
+- `Shortcut Launcher: Manage Custom Entries`：打开管理面板（右侧按钮可编辑 / 删除）
+- `Shortcut Launcher: Delete Custom Entry`：删除（带确认）
 - `Shortcut Launcher: Import Custom Entries (JSON)`：导入 JSON（数组或 `{ "entries": [...] }`）
 - `Shortcut Launcher: Open Custom Entries File`：直接编辑存储文件
-- `Shortcut Launcher: Delete Custom Entry`：删除自定义条目
+
+> 搜索结果里，自定义条目右侧会显示「编辑 / 删除」按钮（鼠标悬停可见）；内置条目只读，不显示按钮。
 
 存储位置：VS Code 的 globalStorage
 
@@ -75,7 +79,7 @@ code --install-extension neilwang.shortcut-launcher
 ### 从 VSIX
 
 ```bash
-code --install-extension shortcut-launcher-0.2.3.vsix
+code --install-extension shortcut-launcher-0.2.4.vsix
 ```
 
 ### 从源码
