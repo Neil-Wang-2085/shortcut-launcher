@@ -79,7 +79,7 @@ code --install-extension neilwang.shortcut-launcher
 ### 从 VSIX
 
 ```bash
-code --install-extension shortcut-launcher-0.2.4.vsix
+code --install-extension shortcut-launcher-0.2.5.vsix
 ```
 
 ### 从源码

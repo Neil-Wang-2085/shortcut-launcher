@@ -144,6 +144,9 @@ export const ZH_ALIASES: Record<string, string[]> = {
   'git.filter-branch-author': ['修改作者', '重写历史', '批量改名', '作者'],
   'git.log-author': ['作者列表', '作者', '邮箱'],
 
+  // vscode
+  'vscode.command-palette': ['打开命令面板', '命令面板', '命令'],
+
   // gdb
   'gdb.start': ['启动', '加载程序'],
   'gdb.run': ['运行'],

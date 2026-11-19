@@ -1,5 +1,5 @@
 [
-  { "id": "vscode.command-palette", "app": "vscode", "type": "shortcut", "title": "Command Palette", "keys": { "win": "Ctrl+Shift+P" }, "description": "Run any command by name", "tags": ["command", "palette"], "platform": "win", "builtin": true },
+  { "id": "vscode.command-palette", "app": "vscode", "type": "shortcut", "title": "Command Palette", "keys": { "win": "Ctrl+Shift+P" }, "description": "Open the Command Palette to run any command by name", "tags": ["command", "palette", "command-palette"], "platform": "win", "builtin": true },
   { "id": "vscode.quick-open", "app": "vscode", "type": "shortcut", "title": "Quick Open File", "keys": { "win": "Ctrl+P" }, "description": "Jump to a file by name", "tags": ["open", "file"], "platform": "win", "builtin": true },
   { "id": "vscode.terminal", "app": "vscode", "type": "shortcut", "title": "Toggle Terminal", "keys": { "win": "Ctrl+`" }, "description": "Show or hide the integrated terminal", "tags": ["terminal", "panel"], "platform": "win", "builtin": true },
   { "id": "vscode.new-terminal", "app": "vscode", "type": "shortcut", "title": "New Terminal", "keys": { "win": "Ctrl+Shift+`" }, "description": "Create a new integrated terminal", "tags": ["terminal", "new"], "platform": "win", "builtin": true },

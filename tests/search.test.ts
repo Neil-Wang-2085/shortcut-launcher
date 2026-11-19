@@ -130,3 +130,9 @@ test('新增: cmake 构建', () => {
   assert.ok(ids('cmake 构建', 6).includes('build.cmake-build'))
 })
 
+test('命令面板: ctrl+shift+p 与中文都能命中', () => {
+  assert.equal(top('ctrl+shift+p')?.id, 'vscode.command-palette')
+  assert.equal(top('命令面板')?.id, 'vscode.command-palette')
+  assert.equal(top('打开命令面板')?.id, 'vscode.command-palette')
+})
+
