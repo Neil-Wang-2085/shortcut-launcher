@@ -48,6 +48,7 @@ export function toSearchDoc(e: Entry): SearchDoc {
       e.title,
       e.description ?? '',
       zh,
+      e.usage ?? '',
       (e.tags ?? []).join(' '),
       (ZH_ALIASES[e.id] ?? []).join(''),
       APP_ZH[e.app] ?? '',

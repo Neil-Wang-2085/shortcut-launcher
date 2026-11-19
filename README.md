@@ -56,7 +56,7 @@
 code --install-extension neilwang.shortcut-launcher
 
 # 或从 Releases 下载 .vsix
-code --install-extension shortcut-launcher-0.2.5.vsix
+code --install-extension shortcut-launcher-0.2.6.vsix
 ```
 
 [Marketplace 页面](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher) · [扩展说明](vscode-extension/README.md)

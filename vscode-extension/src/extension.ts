@@ -145,10 +145,11 @@ async function search(): Promise<void> {
 
 function toItem(e: Entry): EntryItem {
   const detail = e.type === 'shortcut' ? (e.keys.win ?? '') : e.command
+  const info = [e.zh, e.usage].filter(Boolean).join(' · ')
   return {
     label: e.title,
     description: detail,
-    detail: e.zh ?? e.description ?? '',
+    detail: info || (e.description ?? ''),
     entry: e,
     // 自定义条目提供编辑 / 删除按钮；内置条目只读
     buttons: e.builtin === false ? [EDIT_BUTTON, DELETE_BUTTON] : undefined,

@@ -48,6 +48,8 @@ export interface BaseEntry {
   description?: string
   /** 中文说明（用于界面展示与中文检索） */
   zh?: string
+  /** 按下后可做什么（补充说明，显示在详情里） */
+  usage?: string
   /** 检索标签（英文，可含中文别名另见 zh-aliases） */
   tags?: string[]
   /** 适用平台 */

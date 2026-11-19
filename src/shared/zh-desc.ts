@@ -186,7 +186,7 @@ export const ZH_DESC: Record<string, string> = {
   'win.emoji': '表情符号面板',
 
   // ---------------- VS Code ----------------
-  'vscode.command-palette': '打开命令面板：输入命令名或 “>” 执行命令',
+  'vscode.command-palette': '打开命令面板',
   'vscode.quick-open': '快速打开文件',
   'vscode.terminal': '显示 / 隐藏集成终端',
   'vscode.new-terminal': '新建集成终端',

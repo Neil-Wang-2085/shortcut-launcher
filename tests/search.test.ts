@@ -136,3 +136,8 @@ test('命令面板: ctrl+shift+p 与中文都能命中', () => {
   assert.equal(top('打开命令面板')?.id, 'vscode.command-palette')
 })
 
+test('命令面板: usage 说明按下后能做什么', () => {
+  const e = top('命令面板')
+  assert.ok(e?.usage && e.usage.includes('执行命令'), `usage: ${e?.usage}`)
+})
+
