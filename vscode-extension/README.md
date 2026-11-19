@@ -4,7 +4,7 @@
 
 ## 用法
 
-- 快捷键：`Ctrl+Alt+Shift+K`（macOS：`Cmd+Alt+Shift+K`）
+- 快捷键：`Ctrl+Alt+S`（macOS：`Cmd+Alt+S`）
 - 命令面板：`Shortcut Launcher: Search Shortcuts & Commands`
 - 状态栏：点击右下角 `⌨ Shortcuts`
 
@@ -26,8 +26,10 @@
 
 两种方式：
 
-1. 搜索面板底部 **＋ 新增自定义命令…**，按提示填标题 / 命令（或按键）/ 中文说明 / 标签
+1. 快捷键 **`Ctrl+Alt+N`**（macOS：`Cmd+Alt+N`），或搜索面板底部 **＋ 新增自定义命令…**
 2. 命令面板执行 `Shortcut Launcher: Add Custom Command`
+
+> 想换成别的键：`Ctrl+K Ctrl+S` 打开键盘快捷方式，搜索 `Shortcut Launcher: Add Custom Command`，点铅笔图标重新录制即可。
 
 其他命令：
 
@@ -73,7 +75,7 @@ code --install-extension neilwang.shortcut-launcher
 ### 从 VSIX
 
 ```bash
-code --install-extension shortcut-launcher-0.2.1.vsix
+code --install-extension shortcut-launcher-0.2.3.vsix
 ```
 
 ### 从源码

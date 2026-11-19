@@ -41,7 +41,7 @@
 
 ## VS Code 扩展
 
-仓库内提供 VS Code 扩展（`vscode-extension/`），在编辑器里按 `Ctrl+Alt+Shift+K` 搜索同一套 250 条数据：
+仓库内提供 VS Code 扩展（`vscode-extension/`），在编辑器里按 `Ctrl+Alt+S` 搜索同一套 250 条数据：
 
 - 命令：复制到剪贴板，或一键「插入终端」
 - 快捷键：打开键帽面板
@@ -56,7 +56,7 @@
 code --install-extension neilwang.shortcut-launcher
 
 # 或从 Releases 下载 .vsix
-code --install-extension shortcut-launcher-0.2.1.vsix
+code --install-extension shortcut-launcher-0.2.3.vsix
 ```
 
 [Marketplace 页面](https://marketplace.visualstudio.com/items?itemName=neilwang.shortcut-launcher) · [扩展说明](vscode-extension/README.md)
