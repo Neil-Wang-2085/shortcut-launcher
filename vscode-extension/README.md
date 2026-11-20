@@ -58,6 +58,17 @@
 3. 默认勾选「扫描后自动导入」；也可以取消勾选，先看预览再点「导入全部」
 4. 支持三种 JSON 结构：数组、`{ "entries": [...] }`、桌面版的 `user-entries.json`
 
+另外会**递归收集所有 `expression` 字段**（GDB 命令），例如：
+
+```json
+{
+  "commands": [
+    { "name": "regs", "expression": "info registers" },
+    { "name": "bt", "expression": "bt" }
+  ]
+}
+```
+
 > 没有 `id` 的条目会按「文件路径 + 序号」生成稳定 id，重复扫描不会重复导入。
 
 ## 内置数据

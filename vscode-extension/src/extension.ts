@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import { Searcher } from '../../src/shared/search'
 import { ENTRIES } from '../../src/shared/data'
-import { normalizeEntry } from '../../src/shared/store'
+import { normalizeEntry, collectExpressionCommands } from '../../src/shared/store'
 import type { Entry, ShortcutEntry } from '../../src/shared/types'
 
 interface EntryItem extends vscode.QuickPickItem {
@@ -585,6 +585,7 @@ async function scanFolder(root: string): Promise<ScanResult> {
   const files: ScanFile[] = []
   const entries: Entry[] = []
   const seen = new Set<string>()
+  const seenCommands = new Set<string>()
   let fileCount = 0
   const MAX_FILES = 500
 
@@ -612,10 +613,30 @@ async function scanFolder(root: string): Promise<ScanResult> {
                 : item
             const e = normalizeEntry(withId)
             if (!e || seen.has(e.id)) return
+            // 同一命令（含 expression）只收一次
+            if (e.type === 'command') {
+              const cmdKey = e.command.toLowerCase()
+              if (seenCommands.has(cmdKey)) return
+              seenCommands.add(cmdKey)
+            }
             seen.add(e.id)
             entries.push(e)
             count++
           })
+
+          // 递归收集 JSON 里所有 "expression" 字段（GDB 命令）
+          for (const e of collectExpressionCommands(data, rel)) {
+            if (seen.has(e.id)) continue
+            if (e.type === 'command') {
+              const cmdKey = e.command.toLowerCase()
+              if (seenCommands.has(cmdKey)) continue
+              seenCommands.add(cmdKey)
+            }
+            seen.add(e.id)
+            entries.push(e)
+            count++
+          }
+
           files.push({ path: rel, count })
         } catch (err) {
           files.push({ path: rel, count: 0, error: String(err) })

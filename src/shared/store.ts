@@ -20,9 +20,25 @@ function splitTags(v: unknown): string[] {
 
 export function normalizeEntry(raw: any): Entry | null {
   if (!raw || typeof raw !== 'object') return null
-  const type = raw.type
-  if (type !== 'shortcut' && type !== 'command') return null
-  if (!raw.title || typeof raw.title !== 'string') return null
+
+  // GDB 命令常见写法：{ "name": "regs", "expression": "info registers" }
+  const expression =
+    typeof raw.expression === 'string' && raw.expression.trim() ? raw.expression.trim() : ''
+
+  let type = raw.type
+  if (type !== 'shortcut' && type !== 'command') {
+    if (raw.keys || raw.key) type = 'shortcut'
+    else if (raw.command || expression) type = 'command'
+    else return null
+  }
+
+  const title =
+    typeof raw.title === 'string' && raw.title.trim()
+      ? raw.title.trim()
+      : typeof raw.name === 'string' && raw.name.trim()
+        ? raw.name.trim()
+        : expression || (typeof raw.command === 'string' ? raw.command.trim() : '')
+  if (!title) return null
 
   const id =
     typeof raw.id === 'string' && raw.id.trim()
@@ -31,9 +47,9 @@ export function normalizeEntry(raw: any): Entry | null {
 
   const base = {
     id,
-    app: (raw.app ?? 'custom') as any,
-    title: raw.title.trim(),
-    description: raw.description ?? '',
+    app: (raw.app ?? (expression ? 'gdb' : 'custom')) as any,
+    title,
+    description: raw.description ?? raw.zh ?? '',
     tags: splitTags(raw.tags),
     platform: raw.platform ?? 'win',
     version: raw.version,
@@ -46,14 +62,72 @@ export function normalizeEntry(raw: any): Entry | null {
     return { ...base, type: 'shortcut', keys: { win: win.trim() } } as Entry
   }
 
-  if (!raw.command || typeof raw.command !== 'string' || !raw.command.trim()) return null
-  return { ...base, type: 'command', command: raw.command.trim() } as Entry
+  const command =
+    typeof raw.command === 'string' && raw.command.trim()
+      ? raw.command.trim()
+      : expression
+  if (!command) return null
+  return { ...base, type: 'command', command } as Entry
+}
+
+function safeKeyPart(s: string): string {
+  return s.replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'file'
+}
+
+/**
+ * 递归收集 JSON 里所有 `expression` 字段（GDB 命令）。
+ * 支持 `{ commands: [{ name, expression }] }` 这类嵌套结构。
+ */
+export function collectExpressionCommands(data: any, fileKey: string): Entry[] {
+  const out: Entry[] = []
+  const seen = new Set<string>()
+  let counter = 0
+  const key = safeKeyPart(fileKey)
+
+  const walk = (node: any): void => {
+    if (!node || typeof node !== 'object') return
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item)
+      return
+    }
+
+    if (typeof node.expression === 'string' && node.expression.trim()) {
+      const expr = node.expression.trim()
+      if (!seen.has(expr)) {
+        seen.add(expr)
+        const e = normalizeEntry({
+          id: `custom.${key}.expr.${counter++}`,
+          app: node.app ?? 'gdb',
+          type: 'command',
+          title: node.title ?? node.name ?? expr,
+          command: expr,
+          description: node.description ?? node.zh ?? '',
+          tags: node.tags ?? ['imported'],
+          platform: node.platform ?? 'win',
+        })
+        if (e) out.push(e)
+      }
+    }
+
+    for (const [k, v] of Object.entries(node)) {
+      if (k === 'expression') continue
+      walk(v)
+    }
+  }
+
+  walk(data)
+  return out
 }
 
 export function parseJsonImport(text: string): Entry[] {
   const data = JSON.parse(text)
   const arr = Array.isArray(data) ? data : Array.isArray(data?.entries) ? data.entries : []
-  return arr.map(normalizeEntry).filter(Boolean) as Entry[]
+  const entries = arr.map(normalizeEntry).filter(Boolean) as Entry[]
+  const extra = collectExpressionCommands(data, 'import').filter((e) => {
+    if (e.type !== 'command') return false
+    return !entries.some((x) => x.type === 'command' && x.command === e.command)
+  })
+  return [...entries, ...extra]
 }
 
 function parseCsvLine(line: string): string[] {

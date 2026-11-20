@@ -47,7 +47,7 @@
 - 快捷键：打开键帽面板
 - 状态栏入口：`⌨ Shortcuts`
 - 自定义命令：搜索面板底部 **＋ 新增自定义命令…**，支持新增 / 编辑 / 删除
-- **从文件夹批量导入**：命令面板 `Shortcut Launcher: Import Commands from Folder…`，给一个文件夹路径，自动扫描所有 JSON 并导入
+- **从文件夹批量导入**：命令面板 `Shortcut Launcher: Import Commands from Folder…`，扫描所有 JSON 并导入，支持 `expression` 字段里的 GDB 命令
 
 安装（二选一）：
 

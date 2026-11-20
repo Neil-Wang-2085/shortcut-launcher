@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mergeEntries, normalizeEntry, parseJsonImport, parseCsvImport, toCsv } from '../src/shared/store.ts'
+import { mergeEntries, normalizeEntry, parseJsonImport, parseCsvImport, toCsv, collectExpressionCommands } from '../src/shared/store.ts'
 
 const seed = [{ id: 'word.bold', app: 'word', type: 'shortcut', title: 'Bold', keys: { win: 'Ctrl+B' }, builtin: true }] as any[]
 const user = [{ id: 'custom.x', app: 'custom', type: 'command', title: 'X', command: 'x' }] as any[]
@@ -51,4 +51,31 @@ test('csv roundtrip for shortcut', () => {
   assert.equal(back.length, 1)
   assert.equal(back[0].title, 'Bold')
   assert.equal(back[0].type, 'shortcut')
+})
+
+test('expression -> gdb command', () => {
+  const e = normalizeEntry({ name: 'regs', expression: 'info registers' })
+  assert.ok(e && e.type === 'command')
+  assert.equal(e.command, 'info registers')
+  assert.equal(e.app, 'gdb')
+  assert.equal(e.title, 'regs')
+})
+
+test('collect nested expressions', () => {
+  const data = {
+    commands: [
+      { name: 'regs', expression: 'info registers' },
+      { name: 'bt', expression: 'bt' },
+    ],
+  }
+  const out = collectExpressionCommands(data, 'gdb.json')
+  assert.equal(out.length, 2)
+  assert.equal(out[0].command, 'info registers')
+  assert.equal(out[0].id, 'custom.gdb-json.expr.0')
+})
+
+test('json import includes nested expressions', () => {
+  const text = JSON.stringify({ commands: [{ name: 'regs', expression: 'info registers' }] })
+  const out = parseJsonImport(text)
+  assert.ok(out.some((e) => e.type === 'command' && e.command === 'info registers'))
 })

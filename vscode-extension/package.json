@@ -2,7 +2,7 @@
   "name": "shortcut-launcher",
   "displayName": "Shortcut Launcher",
   "description": "Search 250+ Windows / Office / VS Code / Git / GDB shortcuts and commands with Chinese descriptions. Copy commands or view keycaps without leaving VS Code.",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "publisher": "neilwang",
   "license": "MIT",
   "repository": {
