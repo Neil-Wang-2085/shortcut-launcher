@@ -18,53 +18,77 @@ function splitTags(v: unknown): string[] {
   return []
 }
 
+/** 读取字段，兼容 `"expression "` / `"Expression"` 这类 key */
+function field(obj: any, name: string): any {
+  if (!obj || typeof obj !== 'object') return undefined
+  if (Object.prototype.hasOwnProperty.call(obj, name)) return obj[name]
+  const lower = name.toLowerCase()
+  for (const k of Object.keys(obj)) {
+    if (k.trim().toLowerCase() === lower) return obj[k]
+  }
+  return undefined
+}
+
 export function normalizeEntry(raw: any): Entry | null {
   if (!raw || typeof raw !== 'object') return null
 
-  // GDB 命令常见写法：{ "name": "regs", "expression": "info registers" }
-  const expression =
-    typeof raw.expression === 'string' && raw.expression.trim() ? raw.expression.trim() : ''
+  // GDB 命令常见写法：
+  // { "name": "regs", "expression": "info registers" }
+  // { "name": "regs", "expression": ["p s_cursors[{}].ac.curfpa"] }
+  const expressionRaw = field(raw, 'expression')
+  let expression = ''
+  if (typeof expressionRaw === 'string' && expressionRaw.trim()) {
+    expression = expressionRaw.trim()
+  } else if (Array.isArray(expressionRaw)) {
+    const first = expressionRaw.find((x) => typeof x === 'string' && x.trim())
+    if (typeof first === 'string') expression = first.trim()
+  }
 
-  let type = raw.type
+  let type = field(raw, 'type')
+  const keysRaw = field(raw, 'keys')
   if (type !== 'shortcut' && type !== 'command') {
-    if (raw.keys || raw.key) type = 'shortcut'
-    else if (raw.command || expression) type = 'command'
+    if (keysRaw || field(raw, 'key')) type = 'shortcut'
+    else if (field(raw, 'command') || expression) type = 'command'
     else return null
   }
 
+  const titleRaw = field(raw, 'title')
+  const nameRaw = field(raw, 'name')
+  const commandRaw = field(raw, 'command')
   const title =
-    typeof raw.title === 'string' && raw.title.trim()
-      ? raw.title.trim()
-      : typeof raw.name === 'string' && raw.name.trim()
-        ? raw.name.trim()
-        : expression || (typeof raw.command === 'string' ? raw.command.trim() : '')
+    typeof titleRaw === 'string' && titleRaw.trim()
+      ? titleRaw.trim()
+      : typeof nameRaw === 'string' && nameRaw.trim()
+        ? nameRaw.trim()
+        : expression || (typeof commandRaw === 'string' ? commandRaw.trim() : '')
   if (!title) return null
 
+  const idRaw = field(raw, 'id')
   const id =
-    typeof raw.id === 'string' && raw.id.trim()
-      ? raw.id.trim()
+    typeof idRaw === 'string' && idRaw.trim()
+      ? idRaw.trim()
       : `custom.${Date.now()}.${Math.random().toString(36).slice(2, 7)}`
 
   const base = {
     id,
-    app: (raw.app ?? (expression ? 'gdb' : 'custom')) as any,
+    app: (field(raw, 'app') ?? (expression ? 'gdb' : 'custom')) as any,
     title,
-    description: raw.description ?? raw.zh ?? '',
-    tags: splitTags(raw.tags),
-    platform: raw.platform ?? 'win',
-    version: raw.version,
+    description: field(raw, 'description') ?? field(raw, 'zh') ?? '',
+    tags: splitTags(field(raw, 'tags')),
+    platform: field(raw, 'platform') ?? 'win',
+    version: field(raw, 'version'),
     builtin: false,
   }
 
   if (type === 'shortcut') {
-    const win = raw.keys?.win ?? raw.keys ?? raw.key
+    const win = keysRaw?.win ?? keysRaw ?? field(raw, 'key')
     if (!win || typeof win !== 'string' || !win.trim()) return null
     return { ...base, type: 'shortcut', keys: { win: win.trim() } } as Entry
   }
 
   const command =
-    typeof raw.command === 'string' && raw.command.trim()
-      ? raw.command.trim()
+    typeof commandRaw === 'string' && commandRaw.trim()
+      ? commandRaw.trim()
       : expression
   if (!command) return null
   return { ...base, type: 'command', command } as Entry
@@ -76,13 +100,41 @@ function safeKeyPart(s: string): string {
 
 /**
  * 递归收集 JSON 里所有 `expression` 字段（GDB 命令）。
- * 支持 `{ commands: [{ name, expression }] }` 这类嵌套结构。
+ * `expression` 支持字符串或字符串数组，例如：
+ * { "name": "cursors", "expression": ["p s_cursors[{}].ac.curfpa"] }
  */
 export function collectExpressionCommands(data: any, fileKey: string): Entry[] {
   const out: Entry[] = []
   const seen = new Set<string>()
   let counter = 0
   const key = safeKeyPart(fileKey)
+
+  const add = (expr: any, node: any, titleOverride?: string): void => {
+    if (typeof expr !== 'string' || !expr.trim()) return
+    const cmd = expr.trim()
+    if (seen.has(cmd)) return
+    seen.add(cmd)
+
+    const titleField = field(node, 'title')
+    const nameField = field(node, 'name')
+    const title =
+      (titleOverride && titleOverride.trim()) ||
+      (typeof titleField === 'string' && titleField.trim()) ||
+      (typeof nameField === 'string' && nameField.trim()) ||
+      cmd
+
+    const e = normalizeEntry({
+      id: `custom.${key}.expr.${counter++}`,
+      app: field(node, 'app') ?? 'gdb',
+      type: 'command',
+      title,
+      command: cmd,
+      description: field(node, 'description') ?? field(node, 'zh') ?? '',
+      tags: field(node, 'tags') ?? ['imported'],
+      platform: field(node, 'platform') ?? 'win',
+    })
+    if (e) out.push(e)
+  }
 
   const walk = (node: any): void => {
     if (!node || typeof node !== 'object') return
@@ -91,26 +143,27 @@ export function collectExpressionCommands(data: any, fileKey: string): Entry[] {
       return
     }
 
-    if (typeof node.expression === 'string' && node.expression.trim()) {
-      const expr = node.expression.trim()
-      if (!seen.has(expr)) {
-        seen.add(expr)
-        const e = normalizeEntry({
-          id: `custom.${key}.expr.${counter++}`,
-          app: node.app ?? 'gdb',
-          type: 'command',
-          title: node.title ?? node.name ?? expr,
-          command: expr,
-          description: node.description ?? node.zh ?? '',
-          tags: node.tags ?? ['imported'],
-          platform: node.platform ?? 'win',
-        })
-        if (e) out.push(e)
+    const exprRaw = field(node, 'expression')
+    if (typeof exprRaw === 'string') {
+      add(exprRaw, node)
+    } else if (Array.isArray(exprRaw)) {
+      const strings = exprRaw.filter((x) => typeof x === 'string' && x.trim())
+      const titleField = field(node, 'title')
+      const nameField = field(node, 'name')
+      const base =
+        (typeof titleField === 'string' && titleField.trim()) ||
+        (typeof nameField === 'string' && nameField.trim()) ||
+        ''
+      strings.forEach((s, i) => {
+        add(s, node, base ? (strings.length > 1 ? `${base} [${i + 1}]` : base) : undefined)
+      })
+      for (const item of exprRaw) {
+        if (item && typeof item === 'object') walk(item)
       }
     }
 
     for (const [k, v] of Object.entries(node)) {
-      if (k === 'expression') continue
+      if (k.trim().toLowerCase() === 'expression') continue
       walk(v)
     }
   }

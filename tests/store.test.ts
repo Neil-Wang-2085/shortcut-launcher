@@ -79,3 +79,28 @@ test('json import includes nested expressions', () => {
   const out = parseJsonImport(text)
   assert.ok(out.some((e) => e.type === 'command' && e.command === 'info registers'))
 })
+
+test('expression array -> each string is a command', () => {
+  const data = {
+    name: 'cursors',
+    expression: ['p s_cursors[{}].ac.curfpa', 'p s_cursors[{}].ac.prevfpa'],
+  }
+  const out = collectExpressionCommands(data, 'x.json')
+  assert.equal(out.length, 2)
+  assert.equal(out[0].command, 'p s_cursors[{}].ac.curfpa')
+  assert.equal(out[0].title, 'cursors [1]')
+  assert.equal(out[1].command, 'p s_cursors[{}].ac.prevfpa')
+})
+
+test('expression key with trailing space', () => {
+  const out = collectExpressionCommands({ 'expression ': ['p s_cursors[{}].ac.curfpa'] }, 'x.json')
+  assert.equal(out.length, 1)
+  assert.equal(out[0].command, 'p s_cursors[{}].ac.curfpa')
+})
+
+test('normalizeEntry accepts expression array (first item)', () => {
+  const e = normalizeEntry({ name: 'cursors', expression: ['p s_cursors[{}].ac.curfpa'] })
+  assert.ok(e && e.type === 'command')
+  assert.equal(e.command, 'p s_cursors[{}].ac.curfpa')
+  assert.equal(e.app, 'gdb')
+})
